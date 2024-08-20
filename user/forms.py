@@ -14,14 +14,14 @@ class RegisterModelForm(forms.ModelForm):
         fields = ('username', 'email', 'password')
 
     def clean_email(self):
-        email = self.data.get('email')
+        email = self.data.get('email', )
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError(f'This {email} is already registered.')
         return email
 
     def clean_password(self):
-        password = self.data.get('password')
-        confirm_password = self.data.get('confirm_password')
+        password = self.data.get('password', )
+        confirm_password = self.data.get('confirm_password', )
         if password != confirm_password:
             raise forms.ValidationError('Please enter the same password')
         return self.cleaned_data['password']

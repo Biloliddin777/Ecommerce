@@ -66,6 +66,7 @@
 <!-- ===============================================-->
 <!--    Main Content-->
 <!-- ===============================================-->
+
 <main class="main" id="top">
     <div class="container" data-layout="container">
         <script>
@@ -444,84 +445,97 @@
             <div class="card">
                 <div class="card-body p-0 overflow-hidden">
                     <div class="row g-0">
-                        {% for product in products %}
-                            <div class="col-12 p-card">
-                                <div class="row">
-                                    <div class="col-sm-5 col-md-4">
-                                        <div class="position-relative h-sm-100"><a class="d-block h-100"
-                                                                                   href="../../../app/e-commerce/product/product-details.html"><img
-                                                class="img-fluid fit-cover w-sm-100 h-sm-100 rounded-1 absolute-sm-centered"
-                                                src="{% static 'ecommerce/assets/img/products/2.jpg' %}" alt=""/></a>
-                                            <div class="badge rounded-pill bg-success position-absolute top-0 end-0 me-2 mt-2 fs--2 z-index-2">
-                                                New
+                        <a class="btn btn-primary mb-3" href="{% url 'product-create' %}">Create New Product</a>
+                        <ul class="list-group mb-4">
+                            {% for product in products %}
+                                <div class="col-12 p-card">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <a href="{% url 'product-detail' product.pk %}">{{ product.name }}</a>
+                                    </span>
+                                        <span>
+                                        <a class="btn btn-sm btn-warning" href="{% url 'product-update' product.pk %}">Edit</a>
+                                        <a class="btn btn-sm btn-danger" href="{% url 'product-delete' product.pk %}">Delete</a>
+                                    </span>
+                                    </li>
+                                    <div class="row">
+                                        <div class="col-sm-5 col-md-4">
+                                            <div class="position-relative h-sm-100"><a class="d-block h-100"
+                                                                                       href="../../../app/e-commerce/product/product-details.html"><img
+                                                    class="img-fluid fit-cover w-sm-100 h-sm-100 rounded-1 absolute-sm-centered"
+                                                    src="{% static 'ecommerce/assets/img/products/2.jpg' %}"
+                                                    alt=""/></a>
+                                                <div class="badge rounded-pill bg-success position-absolute top-0 end-0 me-2 mt-2 fs--2 z-index-2">
+                                                    New
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-7 col-md-8">
-                                        <div class="row">
-                                            <div class="col-lg-8">
-                                                <h5 class="mt-3 mt-sm-0"><a class="text-dark fs-0 fs-lg-1"
-                                                                            href="../../../app/e-commerce/product/product-details.html">{{ product.title }}</a>
-                                                </h5>
-                                                <p class="fs--1 mb-2 mb-md-3"><a class="text-500" href="#!">Computer
-                                                    &amp; Accessories</a></p>
-                                                <ul class="list-unstyled d-none d-lg-block">
-                                                    <li><span class="fas fa-circle"
-                                                              data-fa-transform="shrink-12"></span><span>16GB RAM</span>
-                                                    </li>
-                                                    <li><span class="fas fa-circle"
-                                                              data-fa-transform="shrink-12"></span><span>1TB SSD Hard Drive</span>
-                                                    </li>
-                                                    <li><span class="fas fa-circle"
-                                                              data-fa-transform="shrink-12"></span><span>10-core Intel Xeon</span>
-                                                    </li>
-                                                    <li><span class="fas fa-circle"
-                                                              data-fa-transform="shrink-12"></span><span>Mac OS</span>
-                                                    </li>
-                                                    <li><span class="fas fa-circle"
-                                                              data-fa-transform="shrink-12"></span><span>Secured</span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-lg-4 d-flex justify-content-between flex-column">
-                                                <div>
-                                                    <h4 class="fs-1 fs-md-2 text-warning mb-0">$1199.5</h4>
-                                                    <h5 class="fs--1 text-500 mb-0 mt-1">
-                                                        <del>$2399</del>
-                                                        <span class="ms-1">-50%</span>
+                                        <div class="col-sm-7 col-md-8">
+                                            <div class="row">
+                                                <div class="col-lg-8">
+                                                    <h5 class="mt-3 mt-sm-0"><a class="text-dark fs-0 fs-lg-1"
+                                                                                href="../../../app/e-commerce/product/product-details.html">{{ product.title }}</a>
                                                     </h5>
-                                                    <div class="mb-2 mt-3"><span class="fa fa-star text-warning"></span><span
-                                                            class="fa fa-star text-warning"></span><span
-                                                            class="fa fa-star text-warning"></span><span
-                                                            class="fa fa-star text-warning"></span><span
-                                                            class="fa fa-star text-300"></span><span
-                                                            class="ms-1">(8)</span>
-                                                    </div>
-                                                    <div class="d-none d-lg-block">
-                                                        <p class="fs--1 mb-1">Shipping Cost: <strong>$50</strong></p>
-                                                        <p class="fs--1 mb-1">Stock: <strong class="text-success">Available</strong>
-                                                        </p>
-                                                    </div>
+                                                    <p class="fs--1 mb-2 mb-md-3"><a class="text-500" href="#!">Computer
+                                                        &amp; Accessories</a></p>
+                                                    <ul class="list-unstyled d-none d-lg-block">
+                                                        <li><span class="fas fa-circle"
+                                                                  data-fa-transform="shrink-12"></span><span>16GB RAM</span>
+                                                        </li>
+                                                        <li><span class="fas fa-circle"
+                                                                  data-fa-transform="shrink-12"></span><span>1TB SSD Hard Drive</span>
+                                                        </li>
+                                                        <li><span class="fas fa-circle"
+                                                                  data-fa-transform="shrink-12"></span><span>10-core Intel Xeon</span>
+                                                        </li>
+                                                        <li><span class="fas fa-circle"
+                                                                  data-fa-transform="shrink-12"></span><span>Mac OS</span>
+                                                        </li>
+                                                        <li><span class="fas fa-circle"
+                                                                  data-fa-transform="shrink-12"></span><span>Secured</span>
+                                                        </li>
+                                                    </ul>
                                                 </div>
-                                                <div class="mt-2"><a
-                                                        class="btn btn-sm btn-outline-secondary border-300 d-lg-block me-2 me-lg-0"
-                                                        href="#!"><span class="far fa-heart"></span><span
-                                                        class="ms-2 d-none d-md-inline-block">Favourite</span></a><a
-                                                        class="btn btn-sm btn-primary d-lg-block mt-lg-2"
-                                                        href="#!"><span class="fas fa-cart-plus"> </span><span
-                                                        class="ms-2 d-none d-md-inline-block">Add to Cart</span></a>
+                                                <div class="col-lg-4 d-flex justify-content-between flex-column">
+                                                    <div>
+                                                        <h4 class="fs-1 fs-md-2 text-warning mb-0">$1199.5</h4>
+                                                        <h5 class="fs--1 text-500 mb-0 mt-1">
+                                                            <del>$2399</del>
+                                                            <span class="ms-1">-50%</span>
+                                                        </h5>
+                                                        <div class="mb-2 mt-3"><span
+                                                                class="fa fa-star text-warning"></span><span
+                                                                class="fa fa-star text-warning"></span><span
+                                                                class="fa fa-star text-warning"></span><span
+                                                                class="fa fa-star text-warning"></span><span
+                                                                class="fa fa-star text-300"></span><span
+                                                                class="ms-1">(8)</span>
+                                                        </div>
+                                                        <div class="d-none d-lg-block">
+                                                            <p class="fs--1 mb-1">Shipping Cost: <strong>$50</strong>
+                                                            </p>
+                                                            <p class="fs--1 mb-1">Stock: <strong class="text-success">Available</strong>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-2"><a
+                                                            class="btn btn-sm btn-outline-secondary border-300 d-lg-block me-2 me-lg-0"
+                                                            href="#!"><span class="far fa-heart"></span><span
+                                                            class="ms-2 d-none d-md-inline-block">Favourite</span></a><a
+                                                            class="btn btn-sm btn-primary d-lg-block mt-lg-2"
+                                                            href="#!"><span class="fas fa-cart-plus"> </span><span
+                                                            class="ms-2 d-none d-md-inline-block">Add to Cart</span></a>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
 
                     </div>
                 </div>
                 <div class="card-footer border-top d-flex justify-content-center">
-                    <div class="pagination">
                         <span class="step-links">
                             {% if products.has_previous %}
                                 <a href="?page=1">&laquo; first</a>
@@ -536,86 +550,87 @@
                                 <a href="?page={{ products.next_page_number }}">next</a>
                                 <a href="?page={{ products.paginator.num_pages }}">last &raquo;</a>
                             {% endif %}
-                        </span> 
-                    </div>
+                        </span>
+                </div>
 
-                </div>
-            </div>
-            <footer class="footer">
-                <div class="row g-0 justify-content-between fs--1 mt-4 mb-3">
-                    <div class="col-12 col-sm-auto text-center">
-                        <p class="mb-0 text-600">Thank you for creating with Falcon <span
-                                class="d-none d-sm-inline-block">| </span><br class="d-sm-none"/> 2021 &copy; <a
-                                href="https://themewagon.com">Themewagon</a></p>
-                    </div>
-                    <div class="col-12 col-sm-auto text-center">
-                        <p class="mb-0 text-600">v3.4.0</p>
-                    </div>
-                </div>
-            </footer>
-        </div>
-        <div class="modal fade" id="authentication-modal" tabindex="-1" role="dialog"
-             aria-labelledby="authentication-modal-label" aria-hidden="true">
-            <div class="modal-dialog mt-6" role="document">
-                <div class="modal-content border-0">
-                    <div class="modal-header px-5 position-relative modal-shape-header bg-shape">
-                        <div class="position-relative z-index-1 light">
-                            <h4 class="mb-0 text-white" id="authentication-modal-label">Register</h4>
-                            <p class="fs--1 mb-0 text-white">Please create your free Falcon account</p>
-                        </div>
-                        <button class="btn-close btn-close-white position-absolute top-0 end-0 mt-2 me-2"
-                                data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body py-4 px-5">
-                        <form>
-                            <div class="mb-3">
-                                <label class="form-label" for="modal-auth-name">Name</label>
-                                <input class="form-control" type="text" autocomplete="on" id="modal-auth-name"/>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="modal-auth-email">Email address</label>
-                                <input class="form-control" type="email" autocomplete="on" id="modal-auth-email"/>
-                            </div>
-                            <div class="row gx-2">
-                                <div class="mb-3 col-sm-6">
-                                    <label class="form-label" for="modal-auth-password">Password</label>
-                                    <input class="form-control" type="password" autocomplete="on"
-                                           id="modal-auth-password"/>
-                                </div>
-                                <div class="mb-3 col-sm-6">
-                                    <label class="form-label" for="modal-auth-confirm-password">Confirm Password</label>
-                                    <input class="form-control" type="password" autocomplete="on"
-                                           id="modal-auth-confirm-password"/>
-                                </div>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="modal-auth-register-checkbox"/>
-                                <label class="form-label" for="modal-auth-register-checkbox">I accept the <a href="#!">terms </a>and
-                                    <a href="#!">privacy policy</a></label>
-                            </div>
-                            <div class="mb-3">
-                                <button class="btn btn-primary d-block w-100 mt-3" type="submit" name="submit">
-                                    Register
-                                </button>
-                            </div>
-                        </form>
-                        <div class="position-relative mt-5">
-                            <hr class="bg-300"/>
-                            <div class="divider-content-center">or register with</div>
-                        </div>
-                        <div class="row g-2 mt-2">
-                            <div class="col-sm-6"><a class="btn btn-outline-google-plus btn-sm d-block w-100"
-                                                     href="#"><span class="fab fa-google-plus-g me-2"
-                                                                    data-fa-transform="grow-8"></span> google</a></div>
-                            <div class="col-sm-6"><a class="btn btn-outline-facebook btn-sm d-block w-100"
-                                                     href="#"><span class="fab fa-facebook-square me-2"
-                                                                    data-fa-transform="grow-8"></span> facebook</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
+        <footer class="footer">
+            <div class="row g-0 justify-content-between fs--1 mt-4 mb-3">
+                <div class="col-12 col-sm-auto text-center">
+                    <p class="mb-0 text-600">Thank you for creating with Falcon <span
+                            class="d-none d-sm-inline-block">| </span><br class="d-sm-none"/> 2021 &copy; <a
+                            href="https://themewagon.com">Themewagon</a></p>
+                </div>
+                <div class="col-12 col-sm-auto text-center">
+                    <p class="mb-0 text-600">v3.4.0</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <div class="modal fade" id="authentication-modal" tabindex="-1" role="dialog"
+         aria-labelledby="authentication-modal-label" aria-hidden="true">
+        <div class="modal-dialog mt-6" role="document">
+            <div class="modal-content border-0">
+                <div class="modal-header px-5 position-relative modal-shape-header bg-shape">
+                    <div class="position-relative z-index-1 light">
+                        <h4 class="mb-0 text-white" id="authentication-modal-label">Register</h4>
+                        <p class="fs--1 mb-0 text-white">Please create your free Falcon account</p>
+                    </div>
+                    <button class="btn-close btn-close-white position-absolute top-0 end-0 mt-2 me-2"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4 px-5">
+                    <form>
+                        <div class="mb-3">
+                            <label class="form-label" for="modal-auth-name">Name</label>
+                            <input class="form-control" type="text" autocomplete="on" id="modal-auth-name"/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="modal-auth-email">Email address</label>
+                            <input class="form-control" type="email" autocomplete="on" id="modal-auth-email"/>
+                        </div>
+                        <div class="row gx-2">
+                            <div class="mb-3 col-sm-6">
+                                <label class="form-label" for="modal-auth-password">Password</label>
+                                <input class="form-control" type="password" autocomplete="on"
+                                       id="modal-auth-password"/>
+                            </div>
+                            <div class="mb-3 col-sm-6">
+                                <label class="form-label" for="modal-auth-confirm-password">Confirm Password</label>
+                                <input class="form-control" type="password" autocomplete="on"
+                                       id="modal-auth-confirm-password"/>
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="modal-auth-register-checkbox"/>
+                            <label class="form-label" for="modal-auth-register-checkbox">I accept the <a
+                                    href="#!">terms </a>and
+                                <a href="#!">privacy policy</a></label>
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-primary d-block w-100 mt-3" type="submit" name="submit">
+                                Register
+                            </button>
+                        </div>
+                    </form>
+                    <div class="position-relative mt-5">
+                        <hr class="bg-300"/>
+                        <div class="divider-content-center">or register with</div>
+                    </div>
+                    <div class="row g-2 mt-2">
+                        <div class="col-sm-6"><a class="btn btn-outline-google-plus btn-sm d-block w-100"
+                                                 href="#"><span class="fab fa-google-plus-g me-2"
+                                                                data-fa-transform="grow-8"></span> google</a></div>
+                        <div class="col-sm-6"><a class="btn btn-outline-facebook btn-sm d-block w-100"
+                                                 href="#"><span class="fab fa-facebook-square me-2"
+                                                                data-fa-transform="grow-8"></span> facebook</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 </main>
 <!-- ===============================================-->
