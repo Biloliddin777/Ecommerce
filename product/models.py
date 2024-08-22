@@ -40,6 +40,7 @@ class Product(BaseModel):
 class Image(BaseModel):
     image = models.ImageField(upload_to='products/', null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+
     is_primary = models.BooleanField(default=False)
 
     class Meta:
@@ -62,14 +63,14 @@ class Comment(BaseModel):
 
 
 class Attribute(BaseModel):
-    name = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 
 class AttributeValue(BaseModel):
-    value = models.CharField(max_length=100, null=True, blank=True)
+    value = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.value
