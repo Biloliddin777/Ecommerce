@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'ecommerce.apps.EcommerceConfig',
     'user.apps.UserConfig',
     'product.apps.ProductConfig',
+    'social_django',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -142,3 +144,15 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'biloliddin14042009@gmail.com'
 EMAIL_HOST_PASSWORD = 'rmni zxme iixq wzns'
 EMAIL_DEFAULT_SENDER = EMAIL_HOST_USER
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'social_core.backends.google.GoogleOAuth2',
+]
+
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '539271534141-9kk1a92ivpl7p2hnqra66svlinvtnmdi.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+
+LOGIN_REDIRECT_URL = 'customers'
