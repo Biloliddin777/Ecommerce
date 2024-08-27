@@ -1,3 +1,11 @@
+import csv
+import datetime
+import json
+
+import openpyxl
+from openpyxl import Workbook
+
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.views import View
@@ -149,3 +157,61 @@ class CustomerDeleteView(View):
             return redirect('ecommerce')
 
         return render(request, 'ecommerce/delete-customer.html', {'customer': customer})
+
+
+from django.http import HttpResponse, JsonResponse
+from django.views import View
+from openpyxl import Workbook
+import csv
+import json
+import datetime
+
+class ExportDataView(View):
+    model = Customer
+    field_names = None
+
+    def get(self, request, *args, **kwargs):
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        export_format = request.GET.get('format')
+
+        if not self.field_names:
+            meta = self.model._meta
+            self.field_names = [field.name for field in meta.fields]
+
+        if export_format == 'csv':
+            return self.export_as_csv(date)
+        elif export_format == 'json':
+            return self.export_as_json(date)
+        elif export_format == 'xlsx':
+            return self.export_as_excel(date)
+        else:
+            return HttpResponse(status=400, content='Invalid format')
+
+    def export_as_csv(self, date):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename={self.model._meta.object_name}-{date}.csv'
+        writer = csv.writer(response)
+        writer.writerow(self.field_names)
+        for obj in self.model.objects.all():
+            writer.writerow([getattr(obj, field) for field in self.field_names])
+        return response
+
+    def export_as_json(self, date):
+        data = list(self.model.objects.all().values('id', 'full_name', 'phone', 'email'))
+        response = JsonResponse(data, safe=False, json_dumps_params={'indent': 4})
+        response['Content-Disposition'] = f'attachment; filename={self.model._meta.object_name}-{date}.json'
+        return response
+
+    def export_as_excel(self, date):
+        workbook = Workbook()
+        worksheet = workbook.active
+        worksheet.title = "Customers"
+        worksheet.append(self.field_names)
+        for obj in self.model.objects.all():
+            row = [getattr(obj, field) for field in self.field_names]
+            worksheet.append(row)
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename={self.model._meta.object_name}-{date}.xlsx'
+        workbook.save(response)
+        return response
+

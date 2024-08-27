@@ -150,9 +150,9 @@ AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',
 ]
 
-
-
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '539271534141-9kk1a92ivpl7p2hnqra66svlinvtnmdi.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 LOGIN_REDIRECT_URL = 'customers'
+
+
