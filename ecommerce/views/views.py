@@ -1,10 +1,7 @@
 import csv
 import datetime
 import json
-
 import openpyxl
-from openpyxl import Workbook
-
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
@@ -12,7 +9,6 @@ from django.views import View
 
 from ecommerce.models import Customer
 from ecommerce.forms import CustomerModelForm
-from django.core.paginator import Paginator
 
 
 # Create your views here.
@@ -23,54 +19,42 @@ def project_management(request):
 
 
 # def customers(request):
-#     search_query = request.GET.get('search', '')
+#     search = request.GET.get('search')
+#     filter_date = request.GET.get('filter', '')
 #     customers = Customer.objects.all()
-#     paginator = Paginator(customers, 3)
-#     page_number = request.GET.get("page")
-#     page_obj = paginator.get_page(page_number)
-#     if search_query:
-#         customers = customers.filter(
-#             Q(first_name__icontains=search_query) |
-#             Q(last_name__icontains=search_query) |
-#             Q(email__icontains=search_query)
-#         )
-#
-#     context = {
-#         'customers': page_obj
-#     }
+#     if search:
+#         customers = customers.filter(Q(full_name__icontains=search) | Q(email__icontains=search))
+#     if filter_date == 'filter_date':
+#         customers = customers.order_by('-created_at')
+#     context = {'customers': customers}
 #     return render(request, 'ecommerce/customers.html', context)
+#
 
-class CustomerModelFormView(View):
+class CustomerListView(View):
     def get(self, request):
-        search_query = request.GET.get('search')
+        search = request.GET.get('search')
+        filter_date = request.GET.get('filter', '')
         customers = Customer.objects.all()
-        paginator = Paginator(customers, 3)
-        page_number = request.GET.get("page")
-        page_obj = paginator.get_page(page_number)
-        if search_query:
-            customers = customers.filter(
-                Q(first_name__icontains=search_query) |
-                Q(last_name__icontains=search_query) |
-                Q(email__icontains=search_query)
-            )
 
-        context = {
-            'customers': page_obj
-        }
+        if search:
+            customers = customers.filter(Q(full_name__icontains=search) | Q(email__icontains=search))
+        if filter_date == 'filter_date':
+            customers = customers.order_by('-created_at')
+        context = {'customers': customers}
         return render(request, 'ecommerce/customers.html', context)
 
 
-# def customer_details(request, customer_id):
-#     customer = get_object_or_404(Customer, id=customer_id)
+# def customer_details(request, customer_slug):
+#     customer = Customer.objects.get(slug=customer_slug)
 #     context = {'customer': customer}
 #     return render(request, 'ecommerce/customer-details.html', context)
 
-
-class CustomerDetailsView(View):
+class CustomerDetailView(View):
     def get(self, request, *args, **kwargs):
-        customer_id = kwargs.get('customer_id')
-        customer = get_object_or_404(Customer, id=customer_id)
-        customer = Customer.objects.get(id=customer.id)
+        customer_slug = kwargs['customer_slug']
+
+        customer = Customer.objects.get(slug=customer_slug)
+        # customer = Customer.objects.raw('''select * from customer where slug=%s''', [customer_slug])
         context = {'customer': customer}
         return render(request, 'ecommerce/customer-details.html', context)
 
@@ -83,23 +67,24 @@ def profile_settings(request):
     return render(request, 'ecommerce/settings.html')
 
 
+#
 # def add_customer(request):
+#     form = CustomerModelForm()
 #     if request.method == 'POST':
 #         form = CustomerModelForm(request.POST, request.FILES)
 #         if form.is_valid():
 #             form.save()
 #             return redirect('customers')
-#     else:
-#         form = CustomerModelForm()
 #
 #     context = {'form': form}
+#
 #     return render(request, 'ecommerce/add-customer.html', context)
 
 
 class CustomerCreateView(View):
     def get(self, request):
         form = CustomerModelForm()
-        return render(request, 'ecommerce/add-customer.html', {"form": form})
+        return render(request, 'ecommerce/add-customer.html', {'form': form})
 
     def post(self, request):
         form = CustomerModelForm(request.POST, request.FILES)
@@ -108,110 +93,140 @@ class CustomerCreateView(View):
             return redirect('customers')
 
 
-# def edit_customer(request, customer_id):
-#     customer = get_object_or_404(Customer, id=customer_id)
+# def edit_customer(request, customer_slug):
+#     customer = get_object_or_404(Customer, slug=customer_slug)
 #     form = CustomerModelForm(instance=customer)
-#
 #     if request.method == 'POST':
 #         form = CustomerModelForm(request.POST, request.FILES, instance=customer)
 #         if form.is_valid():
 #             form.save()
-#             return redirect('ecommerce')
-#     else:
-#         form = CustomerModelForm(instance=customer)
-#
-#     context = {'form': form}
-#     return render(request, 'ecommerce/edit-customer.html', context)
+#             return redirect('customers', )
+#     return render(request, 'ecommerce/settings.html', {'form': form, 'customer': customer})
 
 
 class CustomerUpdateView(View):
-    def get(self, request, customer_id):
-        customer = get_object_or_404(Customer, id=customer_id)
+    def get(self, request, customer_slug):
+        customer = get_object_or_404(Customer, slug=customer_slug)
         form = CustomerModelForm(instance=customer)
         return render(request, 'ecommerce/settings.html', {'form': form, 'customer': customer})
 
-    def post(self, request, customer_id):
-        customer = get_object_or_404(Customer, id=customer_id)
+    def post(self, request, customer_slug):
+        customer = get_object_or_404(Customer, slug=customer_slug)
         form = CustomerModelForm(request.POST, request.FILES, instance=customer)
         if form.is_valid():
             form.save()
+            return redirect('customer_details', customer_slug)
 
-            return redirect("customer_details", customer_id)
 
-
-# def delete_customer(request, customer_id):
-#     customer = get_object_or_404(Customer, id=customer_id)
-#
-#     if request.method == "POST":
+# def delete_customer(request, customer_slug):
+#     customer = get_object_or_404(Customer, slug=customer_slug)
+#     if customer:
 #         customer.delete()
-#         return redirect('ecommerce')
-#
-#     return render(request, 'ecommerce/delete-customer.html', {'customer': customer})
+#         return redirect('customers')
+
 
 class CustomerDeleteView(View):
-    def get(self, request, customer_id):
-        customer = get_object_or_404(Customer, id=customer_id)
-
-        if request.method == "POST":
+    def get(self, request, customer_slug):
+        customer = get_object_or_404(Customer, slug=customer_slug)
+        if customer:
             customer.delete()
-            return redirect('ecommerce')
-
-        return render(request, 'ecommerce/delete-customer.html', {'customer': customer})
+            return redirect('customers')
 
 
-from django.http import HttpResponse, JsonResponse
-from django.views import View
-from openpyxl import Workbook
-import csv
-import json
-import datetime
-
-class ExportDataView(View):
-    model = Customer
-    field_names = None
-
-    def get(self, request, *args, **kwargs):
-        date = datetime.datetime.now().strftime("%Y-%m-%d")
-        export_format = request.GET.get('format')
-
-        if not self.field_names:
-            meta = self.model._meta
-            self.field_names = [field.name for field in meta.fields]
-
-        if export_format == 'csv':
-            return self.export_as_csv(date)
-        elif export_format == 'json':
-            return self.export_as_json(date)
-        elif export_format == 'xlsx':
-            return self.export_as_excel(date)
-        else:
-            return HttpResponse(status=400, content='Invalid format')
-
-    def export_as_csv(self, date):
+def export_data(request):
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
+    format = request.GET.get('format')
+    if format == 'csv':
+        meta = Customer._meta
+        field_names = [field.name for field in meta.fields]
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename={self.model._meta.object_name}-{date}.csv'
+
+        response['Content-Disposition'] = f'attachment; filename={Customer._meta.object_name}-{date}.csv'
         writer = csv.writer(response)
-        writer.writerow(self.field_names)
-        for obj in self.model.objects.all():
-            writer.writerow([getattr(obj, field) for field in self.field_names])
-        return response
+        writer.writerow(field_names)
+        for obj in Customer.objects.all():
+            writer.writerow([getattr(obj, field) for field in field_names])
 
-    def export_as_json(self, date):
-        data = list(self.model.objects.all().values('id', 'full_name', 'phone', 'email'))
-        response = JsonResponse(data, safe=False, json_dumps_params={'indent': 4})
-        response['Content-Disposition'] = f'attachment; filename={self.model._meta.object_name}-{date}.json'
-        return response
 
-    def export_as_excel(self, date):
-        workbook = Workbook()
-        worksheet = workbook.active
-        worksheet.title = "Customers"
-        worksheet.append(self.field_names)
-        for obj in self.model.objects.all():
-            row = [getattr(obj, field) for field in self.field_names]
-            worksheet.append(row)
+    elif format == 'json':
+        response = HttpResponse(content_type='application/json')
+        data = list(Customer.objects.all())
+        response.write(json.dumps(data, indent=4, default=str))
+        response['Content-Disposition'] = f'attachment; filename={Customer._meta.object_name}-{date}.json'
+
+
+
+
+    elif format == 'xlsx':
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = f'attachment; filename={self.model._meta.object_name}-{date}.xlsx'
+        response['Content-Disposition'] = f'attachment; filename="{Customer._meta.object_name}-{date}.xlsx"'
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        worksheet.title = 'Customers'
+        header = ['ID', 'Full Name', 'Email', 'Addres', 'Slug', 'Phone Number']
+
+        worksheet.append(header)
+        customers = Customer.objects.all()
+        for obj in customers:
+            worksheet.append([obj.id, obj.full_name, obj.email, obj.address, obj.slug, obj.phone])
+
         workbook.save(response)
         return response
 
+    # header
+
+    else:
+        response = HttpResponse(status=404)
+        response.content = 'Bad Request'
+
+    return response
+
+
+class ExportData(View):
+    def get(self, request):
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        format = request.GET.get('format')
+        if format == 'csv':
+            meta = Customer._meta
+            field_names = [field.name for field in meta.fields]
+            response = HttpResponse(content_type='text/csv')
+
+            response['Content-Disposition'] = f'attachment; filename={Customer._meta.object_name}-{date}.csv'
+            writer = csv.writer(response)
+            writer.writerow(field_names)
+            for obj in Customer.objects.all():
+                writer.writerow([getattr(obj, field) for field in field_names])
+
+
+        elif format == 'json':
+            response = HttpResponse(content_type='application/json')
+            data = list(Customer.objects.all())
+            response.write(json.dumps(data, indent=4, default=str))
+            response['Content-Disposition'] = f'attachment; filename={Customer._meta.object_name}-{date}.json'
+
+
+
+
+        elif format == 'xlsx':
+            response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = f'attachment; filename="{Customer._meta.object_name}-{date}.xlsx"'
+            workbook = openpyxl.Workbook()
+            worksheet = workbook.active
+            worksheet.title = 'Customers'
+            header = ['ID', 'Full Name', 'Email', 'Addres', 'Slug', 'Phone Number']
+
+            worksheet.append(header)
+            customers = Customer.objects.all()
+            for obj in customers:
+                worksheet.append([obj.id, obj.full_name, obj.email, obj.address, obj.slug, obj.phone])
+
+            workbook.save(response)
+            return response
+
+        # header
+
+        else:
+            response = HttpResponse(status=404)
+            response.content = 'Bad Request'
+
+        return response

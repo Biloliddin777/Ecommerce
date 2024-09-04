@@ -1,36 +1,24 @@
-from urllib import request
-
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.views import LoginView, LogoutView
-from django.core.mail import send_mail
+from django.contrib.auth import login, logout
+from django.contrib.auth.views import LoginView
+from django.core.mail import send_mail, EmailMessage
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.views import View
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import FormView
 
 from config.settings import EMAIL_DEFAULT_SENDER
 from user.forms import LoginForm, RegisterModelForm, SendingEmailForm
 from user.authentication_form import AuthenticationForm
 
-from django.contrib.auth import logout
-from django.shortcuts import redirect
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
 
-# def login_page(request):
-#     if request.method == 'POST':
-#         form = LoginForm(request.POST)
-#         if form.is_valid():
-#             email: str = form.cleaned_data['email']
-#             password: str = form.cleaned_data['password']
-#             user = authenticate(request, email=email, password=password)
-#             if user:
-#                 login(request, user)
-#                 return redirect('project_management')
-#             else:
-#                 messages.error(request, 'Invalid Username or Password')
-#     else:
-#         form = LoginForm()
-#     return render(request, 'ecommerce/auth/login.html', {'form': form})
+from user.models import User
+from user.tokens import account_activation_token
 
 
 class LoginPage(LoginView):
@@ -46,28 +34,6 @@ class LoginPage(LoginView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-def register_page(request):
-    if request.method == 'POST':
-        form = RegisterModelForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.save()
-            send_mail(
-                'User Succesfully Registered',
-                'Test body',
-                EMAIL_DEFAULT_SENDER,
-                [user.email],
-                fail_silently=False
-
-            )
-            login(request, user)
-            return redirect('customers')
-    else:
-        form = RegisterModelForm()
-    context = {'form': form}
-    return render(request, 'ecommerce/auth/register.html', context)
-
-
 class RegisterPage(FormView):
     template_name = 'ecommerce/auth/register.html'
     form_class = RegisterModelForm
@@ -76,28 +42,63 @@ class RegisterPage(FormView):
     def form_valid(self, form):
         user = form.save(commit=False)
         user.save()
-        send_mail(
-            'User Succesfully Registered',
-            'Test body',
+        current_site = get_current_site(self.request)
+        message = render_to_string('user/acc_active_email.html', {
+            'user': user,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            'token': account_activation_token.make_token(user),
+        })
+        email = EmailMessage(
+            'Activate Your Account',
+            message,
             EMAIL_DEFAULT_SENDER,
             [user.email],
-            fail_silently=False
-
         )
-        login(self.request, user)
-        return super().form_valid(form)
+        email.content_subtype = 'html'
+        email.send()
+
+        return HttpResponse('''
+            <html>
+            <head>
+                <title>Registration Confirmation</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f4f4f4;
+                        color: #333;
+                        margin: 0;
+                        padding: 20px;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #fff;
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        text-align: center;
+                    }
+                    h1 {
+                        color: #4CAF50;
+                    }
+                    p {
+                        line-height: 1.6;
+                        font-size: 16px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Thank You!</h1>
+                    <p>Please confirm your email address by clicking the link sent to your email to complete the registration process.</p>
+                </div>
+            </body>
+            </html>
+        ''')
 
 
-# FormView
-
-def logout_page(request):
-    if request.method == 'POST':
-        logout(request)
-        return redirect('customers')
-
-
-
-class LogoutPage(LoginView):
+class LogoutPage(View):
     def post(self, request, *args, **kwargs):
         logout(request)
         return redirect('customers')
@@ -128,8 +129,125 @@ class SendingEmail(View):
                 fail_silently=False
             )
             self.sent = True
-            context = {
-                'form': form,
-                'sent': self.sent
-            }
-            return render(request, 'user/send-email.html', context)
+        context = {
+            'form': form,
+            'sent': self.sent
+        }
+        return render(request, 'user/send-email.html', context)
+
+
+class ActivateAccount(View):
+    def get(self, request, uidb64, token):
+        try:
+            uid = force_bytes(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user and account_activation_token.check_token(user, token):
+            user.is_active = True
+            user.save()
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return HttpResponse('''
+                <html>
+                <head>
+                    <title>Account Activation</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            background-color: #f4f4f4;
+                            color: #333;
+                            margin: 0;
+                            padding: 20px;
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background-color: #fff;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            text-align: center;
+                        }
+                        h1 {
+                            color: #4CAF50;
+                        }
+                        p {
+                            line-height: 1.6;
+                            font-size: 16px;
+                        }
+                        .btn {
+                            display: inline-block;
+                            padding: 10px 20px;
+                            font-size: 16px;
+                            color: #fff;
+                            background-color: #4CAF50;
+                            border-radius: 5px;
+                            text-decoration: none;
+                            margin-top: 20px;
+                        }
+                        .btn:hover {
+                            background-color: #45a049;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1>Thank You!</h1>
+                        <p>Your email has been successfully confirmed. </p>
+                    </div>
+                </body>
+                </html>
+            ''')
+        else:
+            return HttpResponse('''
+                <html>
+                <head>
+                    <title>Account Activation</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            background-color: #f4f4f4;
+                            color: #333;
+                            margin: 0;
+                            padding: 20px;
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background-color: #fff;
+                            padding: 20px;
+                            border-radius: 8px;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            text-align: center;
+                        }
+                        h1 {
+                            color: #e74c3c;
+                        }
+                        p {
+                            line-height: 1.6;
+                            font-size: 16px;
+                        }
+                        .btn {
+                            display: inline-block;
+                            padding: 10px 20px;
+                            font-size: 16px;
+                            color: #fff;
+                            background-color: #e74c3c;
+                            border-radius: 5px;
+                            text-decoration: none;
+                            margin-top: 20px;
+                        }
+                        .btn:hover {
+                            background-color: #c0392b;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1>Oops!</h1>
+                        <p>The activation link is invalid or has expired.</p>
+                    </div>
+                </body>
+                </html>
+            ''')
