@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.5rem;
+            color: #333;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .book-section, .author-section {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .fade-out {
+            animation: fadeOut 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<button onclick="toggleSection('authors')">Authors</button>
+<div id="authors" class="author-section">
+    {% for author in authors %}
+        <p>{{ author.name }}</p>
+    {% empty %} 
+        <p>No authors available.</p>
+    {% endfor %}
+</div>
+
+<button onclick="toggleSection('book1')">Books Count</button>
+<div id="book1" class="book-section">
+    {% for book in books1 %}
+        <p>{{ book.author__name }} => {{ book.book_count }}</p>
+    {% empty %}
+        <p>No data available.</p>
+    {% endfor %}
+</div>
+
+<button onclick="toggleSection('book2')">Max Price</button>
+<div id="book2" class="book-section">
+    {% for book in books2 %}
+        <p>{{ book.author__name }} => {{ book.max_price }}</p>
+    {% empty %}
+        <p>No data available.</p>
+    {% endfor %}
+</div>
+
+<button onclick="toggleSection('book3')">Min Price</button>
+<div id="book3" class="book-section">
+    {% for book in books3 %}
+        <p>{{ book.author__name }} => {{ book.min_price }}</p>
+    {% empty %}
+        <p>No data available.</p>
+    {% endfor %}
+</div>
+
+<button onclick="toggleSection('book4')">Average Price</button>
+<div id="book4" class="book-section">
+    {% for book in books4 %}
+        <p>{{ book.author__name }} => {{ book.avg }}</p>
+    {% empty %}
+        <p>No data available.</p>
+    {% endfor %}
+</div>
+
+<script>
+    function toggleSection(sectionId) {
+        var section = document.getElementById(sectionId);
+        if (section.style.display === "none" || section.style.display === "") {
+            section.classList.remove('fade-out');
+            section.classList.add('fade-in');
+            section.style.display = "block";
+        } else {
+            section.classList.remove('fade-in');
+            section.classList.add('fade-out');
+            setTimeout(function() {
+                section.style.display = "none";
+            }, 500);
+        }
+    }
+</script>
+
+</body>
+</html>
