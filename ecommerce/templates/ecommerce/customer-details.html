@@ -44,7 +44,7 @@
                     <h5 class="mb-0">Details</h5>
                 </div>
                 <div class="col-auto">
-                    <a class="btn btn-falcon-default btn-sm" href="{% url 'edit_customer' customer.id %}">
+                    <a class="btn btn-falcon-default btn-sm" href="{% url 'edit_customer' customer.slug %}">
                         <span class="fas fa-pencil-alt fs--2 me-1"></span>Update details
                     </a>
                 </div>
@@ -56,7 +56,7 @@
                     <h6 class="fw-semi-bold text-uppercase mb-3">Account Information</h6>
                     <div class="row mb-2">
                         <div class="col-5 col-sm-4">ID</div>
-                        <div class="col">{{ customer.id }}</div>
+                        <div class="col">{{ customer.slug }}</div>
                     </div>
                     <div class="row mb-2">
                         <div class="col-5 col-sm-4">Created</div>
@@ -102,5 +102,5 @@
                 <span class="fas fa-check fs--2 me-1"></span>Save changes
             </a>
         </div>
-    </div>
+    </div> 
 {% endblock %}

@@ -1,0 +1,52 @@
+[
+    {
+        "id": 21,
+        "full_name": "John",
+        "email": "john@gmail.com",
+        "phone": "+998111111111",
+        "address": "USA",
+        "image": "customer_image/bmw-5-series-sedan-m-models-equipment-sd-individual-01_psrOUM6.jpg",
+        "slug": "john",
+        "deleted_at": "2024-09-11 21:10:31"
+    },
+    {
+        "id": 22,
+        "full_name": "Bilol",
+        "email": "bilol@gmail.com",
+        "phone": "+998999999999",
+        "address": "Tashkent",
+        "image": "customer_image/mercedes-maybach-gls-2020.jpg",
+        "slug": "bilol",
+        "deleted_at": "2024-09-11 21:10:49"
+    },
+    {
+        "id": 23,
+        "full_name": "Bilol",
+        "email": "bilol@gmail.com",
+        "phone": "+998999999999",
+        "address": "Tashkent",
+        "image": "customer_image/mercedes-maybach-gls-2020_39YQFbL.jpg",
+        "slug": "bilol",
+        "deleted_at": "2024-09-11 21:18:33"
+    },
+    {
+        "id": 24,
+        "full_name": "Bilol",
+        "email": "bilol@gmail.com",
+        "phone": "+998999999999",
+        "address": "Tashkent",
+        "image": "customer_image/mercedes-maybach-gls-2020_rT8oV6V.jpg",
+        "slug": "bilol",
+        "deleted_at": "2024-09-11 21:18:33"
+    },
+    {
+        "id": 25,
+        "full_name": "anna",
+        "email": "anna@gmail.com",
+        "phone": "+998888888888",
+        "address": "Russia",
+        "image": "customer_image/macbok.webp",
+        "slug": "anna",
+        "deleted_at": "2024-09-11 21:31:01"
+    }
+]
